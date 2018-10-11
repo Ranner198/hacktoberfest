@@ -1,0 +1,110 @@
+//hangman game
+
+//requires
+var request = require('ajax-request');
+var readline = require('readline-sync');
+var fs = require('fs');
+var remove = require('remove-function');
+
+//basic variables
+var word = [];
+var finished = false;
+var numOfGuesses = 0;
+var guess = '';
+
+
+//Generate
+var generate = readline.question("Would you like it auto generated?: ");
+generate.toLowerCase();
+
+//Logic
+if (generate == 'y') {
+  var obj = JSON.parse(fs.readFileSync('Output.txt', 'utf8'));
+  var rand = obj[Math.floor(Math.random() * obj.length)];
+  testWord = rand;
+} else {
+  //input word
+  var testWord = readline.question("What is the word?: ");
+  testWord.toLowerCase();
+
+  //check word 
+  while (!testWord.match(/^[a-z]+$/)) {
+
+    console.log("letters only please no spaces or special characters");
+
+    testWord = readline.question("What is the word?: ");
+    testWord.toLowerCase();
+  }
+}
+
+//make into array
+word = testWord.split('');
+
+//clear text
+console.log('\x1Bc');
+
+//hide the word
+var hiddenWord = [];
+var hiddenWordLength = '';
+
+for (var i = 0; i < word.length; i++) {
+  hiddenWord.push('*');
+  hiddenWordLength += "*";
+}
+
+//character guess array
+var characterArray = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 
+'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 
+'t', 'u', 'v', 'w', 'x', 'y', 'z'];
+
+//function guess() {
+while(!finished) {
+
+  console.log("Hidden Word: " + hiddenWord.join(''));
+
+  console.log("Available Words: " + characterArray.join(','));
+
+  guess = readline.question("What letter would you like to guess?: ");
+
+  while(guess.length != 1) {
+      guess = readline.question("What letter would you like to guess?: ");
+  }
+
+  //clear text
+  console.log('\x1Bc');
+
+  numOfGuesses++;
+
+  if (word.includes(guess)) {
+    for (var i = 0; i < word.length; i++)
+    {
+      if (word[i] == guess) {
+        hiddenWord[i] = word[i];
+      }
+    }
+
+    console.log("yes, the word contains: " + guess);
+
+    if (!hiddenWord.includes('*')) {
+      finished = true;
+    }
+  } else {
+    console.log("Sorry, " + guess + " was not in the word.");
+  }
+
+  var num = characterArray.indexOf(guess)
+
+  if (num >= 0)
+    characterArray.removeAt(num);
+}
+
+console.log("congrats the word was: " + word.join('') + "\r\nIt only took: "
+ + numOfGuesses + " to get it right.");
+
+readline.question('press \'Enter\' to continue...');
+
+console.log('\x1Bc');
+
+
+
+
